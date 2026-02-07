@@ -108,15 +108,20 @@ self.addEventListener('fetch', (event) => {
         if (cachedResponse) {
           // Return cached version but update in background
           fetch(event.request).then((networkResponse) => {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, networkResponse);
+              });
+            }
           }).catch(() => { });
           return cachedResponse;
         }
 
         // Not in cache, fetch from network
         return fetch(event.request).then((networkResponse) => {
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
           // Cache the new response
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -125,11 +130,17 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('TimeVault SW: Fetch failed', error);
         // If both cache and network fail, return offline page for HTML
-        if (event.request.headers.get('accept').includes('text/html')) {
+        if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
           return caches.match(OFFLINE_URL);
         }
+        // For other resources, return a basic error response
+        return new Response('Network error', {
+          status: 408,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       })
   );
 });
@@ -145,7 +156,19 @@ self.addEventListener('sync', (event) => {
 // Push notification support
 self.addEventListener('push', (event) => {
   if (event.data) {
-    const data = event.data.json();
+    let data;
+    try {
+      // Try to parse as JSON
+      data = event.data.json();
+    } catch (e) {
+      // If not JSON, use text content
+      console.log('TimeVault SW: Push data is not JSON, using text');
+      data = {
+        title: 'TimeVault',
+        body: event.data.text() || 'Time to check your TimeVault!'
+      };
+    }
+
     const options = {
       body: data.body || 'Time to check your TimeVault!',
       icon: './icons/time-icons_android_192x192.png',

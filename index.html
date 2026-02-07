@@ -52,7 +52,6 @@
       <div class="splash-logo-wrapper">
         <img src="icons/time-icons_android_192x192.png" alt="TimeVault Logo" width="96" height="96" loading="eager"
           decoding="async" class="splash-favicon">
-        <h1 class="splash-title">TimeVault</h1>
       </div>
 
       <!-- Waves Container - Enhanced ripple effect -->
@@ -165,8 +164,7 @@
     <!-- Main Content Area -->
     <div class="app-main">
       <div class="main-header-line">
-        <div class="header-left"
-         <h1>Dashboard</h1>
+        <div class="header-left" <h1>Dashboard</h1>
         </div>
         <div class="action-buttons">
           <button class="ai-toggle-btn" id="ai-toggle-btn" title="AI Assistant">
@@ -980,30 +978,6 @@
   <!-- Import File Input (Hidden) -->
   <input type="file" id="import-file" accept=".json" class="visually-hidden" aria-label="Import backup file">
 
-  <script src="apps.js"></script>
-
-  <!-- Splash Screen & Dashboard Transition Handler -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const splashScreen = document.getElementById('splash-screen');
-      const appContainer = document.getElementById('app-container');
-      const appFooter = document.getElementById('app-footer');
-
-      setTimeout(function () {
-        splashScreen.classList.add('hidden');
-        appContainer.classList.add('visible');
-        appFooter.classList.add('visible');
-        console.log('TimeVault: Loading complete - Dashboard ready');
-      }, 2500);
-
-      document.body.style.overflow = 'hidden';
-
-      setTimeout(function () {
-        document.body.style.overflow = 'auto';
-      }, 4000);
-    });
-  </script>
-
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -1017,100 +991,32 @@
     }
   </script>
 
-  <!-- Particles.js Initialization -->
+  <!-- Main Application Script -->
+  <script src="apps.js"></script>
+
+  <!-- Initialize TimeVault and Handle Splash Screen -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      if (typeof particlesJS !== 'undefined') {
-        particlesJS('particles-js', {
-          "particles": {
-            "number": {
-              "value": 50,
-              "density": {
-                "enable": true,
-                "value_area": 1000
-              }
-            },
-            "color": {
-              "value": "#ffffff"
-            },
-            "shape": {
-              "type": "circle",
-              "stroke": {
-                "width": 0,
-                "color": "#000000"
-              }
-            },
-            "opacity": {
-              "value": 0.3,
-              "random": true,
-              "anim": {
-                "enable": true,
-                "speed": 0.5,
-                "opacity_min": 0.1,
-                "sync": false
-              }
-            },
-            "size": {
-              "value": 3,
-              "random": true,
-              "anim": {
-                "enable": true,
-                "speed": 1,
-                "size_min": 0.5,
-                "sync": false
-              }
-            },
-            "line_linked": {
-              "enable": true,
-              "distance": 150,
-              "color": "#ffffff",
-              "opacity": 0.15,
-              "width": 1
-            },
-            "move": {
-              "enable": true,
-              "speed": 1.2,
-              "direction": "none",
-              "random": true,
-              "straight": false,
-              "out_mode": "out",
-              "bounce": false,
-              "attract": {
-                "enable": false,
-                "rotateX": 600,
-                "rotateY": 1200
-              }
-            }
-          },
-          "interactivity": {
-            "detect_on": "canvas",
-            "events": {
-              "onhover": {
-                "enable": true,
-                "mode": "grab"
-              },
-              "onclick": {
-                "enable": true,
-                "mode": "push"
-              },
-              "resize": true
-            },
-            "modes": {
-              "grab": {
-                "distance": 140,
-                "line_linked": {
-                  "opacity": 0.4
-                }
-              },
-              "push": {
-                "particles_nb": 3
-              }
-            }
-          },
-          "retina_detect": true
-        });
-        console.log('TimeVault: Particles.js initialized');
-      }
+      const splashScreen = document.getElementById('splash-screen');
+      const appContainer = document.getElementById('app-container');
+      const appFooter = document.getElementById('app-footer');
+
+      // Initialize TimeVault app
+      TimeVault.init();
+
+      // Handle splash screen transition
+      setTimeout(function () {
+        splashScreen.classList.add('hidden');
+        appContainer.classList.add('visible');
+        if (appFooter) appFooter.classList.add('visible');
+        console.log('TimeVault: Loading complete - Dashboard ready');
+      }, 2500);
+
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(function () {
+        document.body.style.overflow = 'auto';
+      }, 4000);
     });
   </script>
 
