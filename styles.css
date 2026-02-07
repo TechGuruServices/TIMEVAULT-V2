@@ -341,6 +341,7 @@ body {
   /* PWA Fixes */
   overscroll-behavior-y: contain;
   -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
@@ -409,8 +410,10 @@ html {
   flex-direction: column;
   position: relative;
   /* Modern browsers (Firefox) */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(61, 126, 255, 0.3) transparent;
+  @supports (scrollbar-width: thin) {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(61, 126, 255, 0.3) transparent;
+  }
   /* Legacy Edge */
   -ms-overflow-style: -ms-autohiding-scrollbar;
 }
