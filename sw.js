@@ -22,7 +22,8 @@ const CACHE_ASSETS = [
   './icons/time-icons_android_512x512.png',
   './icons/time-icons_apple_180x180.png',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
-  'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js'
+  'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+  'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'
 ];
 
 // Install event - cache assets

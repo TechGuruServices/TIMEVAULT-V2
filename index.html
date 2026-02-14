@@ -7,6 +7,7 @@
   <meta name="description" content="TIMEVAULT ― Your AI-Powered Time Keeper + Payroll Calculator">
   <meta name="theme-color" content="#01081f">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TimeVault">
   <title>TimeVault - Premium Time Tracking & Payroll</title>
@@ -164,7 +165,8 @@
     <!-- Main Content Area -->
     <div class="app-main">
       <div class="main-header-line">
-        <div class="header-left" <h1>Dashboard</h1>
+        <div class="header-left">
+          <h1>Dashboard</h1>
         </div>
         <div class="action-buttons">
           <button class="ai-toggle-btn" id="ai-toggle-btn" title="AI Assistant">
@@ -994,29 +996,11 @@
   <!-- Main Application Script -->
   <script src="apps.js"></script>
 
-  <!-- Initialize TimeVault and Handle Splash Screen -->
+  <!-- Initialize TimeVault -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const splashScreen = document.getElementById('splash-screen');
-      const appContainer = document.getElementById('app-container');
-      const appFooter = document.getElementById('app-footer');
-
-      // Initialize TimeVault app
-      TimeVault.init();
-
-      // Handle splash screen transition
-      setTimeout(function () {
-        splashScreen.classList.add('hidden');
-        appContainer.classList.add('visible');
-        if (appFooter) appFooter.classList.add('visible');
-        console.log('TimeVault: Loading complete - Dashboard ready');
-      }, 2500);
-
       document.body.style.overflow = 'hidden';
-
-      setTimeout(function () {
-        document.body.style.overflow = 'auto';
-      }, 4000);
+      TimeVault.init();
     });
   </script>
 

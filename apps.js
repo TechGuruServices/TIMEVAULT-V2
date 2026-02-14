@@ -112,6 +112,7 @@ const TimeVault = {
 		setTimeout(() => {
 			const splash = document.getElementById('splash-screen');
 			const appContainer = document.getElementById('app-container');
+			const appFooter = document.getElementById('app-footer');
 
 			if (splash) {
 				splash.classList.add('hidden');
@@ -123,7 +124,14 @@ const TimeVault = {
 			if (appContainer) {
 				appContainer.classList.add('visible');
 			}
-		}, 1500); // Show splash for 1.5 seconds
+
+			if (appFooter) {
+				appFooter.classList.add('visible');
+			}
+
+			document.body.style.overflow = 'auto';
+			console.log('TimeVault: Loading complete - Dashboard ready');
+		}, 1500);
 	},
 
 	initParticles() {
@@ -1707,12 +1715,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		}
 
 
-		// Settings modal
-		document.querySelectorAll('[data-view="settings"]').forEach(el => {
-			el.addEventListener('click', () => {
-				document.getElementById('settings-modal')?.classList.remove('hidden');
-			});
-		});
+
 
 		document.getElementById('close-settings')?.addEventListener('click', () => {
 			document.getElementById('settings-modal')?.classList.add('hidden');
@@ -1730,6 +1733,25 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		if ('Notification' in window && Notification.permission === 'default') {
 			Notification.requestPermission();
 		}
+
+		// Add Entry, Export, and Filter buttons
+		document.getElementById('add-entry-btn')?.addEventListener('click', () => this.showAddEntryModal());
+		document.getElementById('export-payroll-btn')?.addEventListener('click', () => this.exportPayrollPDF());
+		document.getElementById('export-report-btn')?.addEventListener('click', () => this.exportReportCSV());
+		document.getElementById('save-settings-btn')?.addEventListener('click', () => this.saveSettings());
+		document.getElementById('filter-report-btn')?.addEventListener('click', () => this.filterReport());
+		document.getElementById('timecard-filter')?.addEventListener('change', () => this.renderTimeCard());
+		document.getElementById('payroll-period-select')?.addEventListener('change', () => this.renderPayroll());
+
+		// Settings page data management
+		document.getElementById('settings-export-data')?.addEventListener('click', () => this.exportData());
+		document.getElementById('settings-import-data')?.addEventListener('click', () => document.getElementById('import-file').click());
+		document.getElementById('settings-clear-data')?.addEventListener('click', () => {
+			if (confirm('Are you sure you want to delete ALL your TimeVault data? This cannot be undone.')) {
+				localStorage.removeItem('timevault_data');
+				location.reload();
+			}
+		});
 
 		// Update dashboard periodically if working
 		setInterval(() => {
@@ -1826,8 +1848,6 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		document.getElementById('filter-total-hours').textContent = totalHours.toFixed(1);
 		document.getElementById('filter-total-earnings').textContent = this.formatCurrency(totalEarnings);
 
-		// Add filter change listener
-		document.getElementById('timecard-filter')?.addEventListener('change', () => this.renderTimeCard());
 	},
 
 	getFilteredEntries(filter) {
@@ -1916,8 +1936,6 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		document.getElementById('overtime-hours-detail').textContent =
 			`${overtimeHours.toFixed(1)} hours @ ${this.formatCurrency(this.settings.hourlyRate * this.settings.overtimeMultiplier)}/hr`;
 
-		// Add period change listener
-		document.getElementById('payroll-period-select')?.addEventListener('change', () => this.renderPayroll());
 	},
 
 	getPayrollEntries(period) {
@@ -2091,16 +2109,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		const dataSize = new Blob([localStorage.getItem('timevault_data') || '']).size;
 		document.getElementById('storage-used').textContent = `${(dataSize / 1024).toFixed(2)} KB`;
 
-		// Add save settings listener
-		document.getElementById('save-settings-btn')?.addEventListener('click', () => this.saveSettings());
-		document.getElementById('settings-export-data')?.addEventListener('click', () => this.exportData());
-		document.getElementById('settings-import-data')?.addEventListener('click', () => document.getElementById('import-file').click());
-		document.getElementById('settings-clear-data')?.addEventListener('click', () => {
-			if (confirm('Are you sure you want to delete ALL your TimeVault data? This cannot be undone.')) {
-				localStorage.removeItem('timevault_data');
-				location.reload();
-			}
-		});
+
 	},
 
 	saveSettings() {
@@ -2116,32 +2125,6 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		this.showNotification('Settings Saved', 'Your settings have been updated successfully');
 	},
 
-	// ============================================
-	// VIEW RENDERING STUBS
-	// ============================================
-
-	renderTimecard() {
-		// Timecard rendering logic
-		console.log('TimeVault: Rendering timecard view');
-	},
-
-	renderPayroll() {
-		// Payroll rendering logic
-		console.log('TimeVault: Rendering payroll view');
-	},
-
-	renderReports() {
-		// Reports rendering logic
-		console.log('TimeVault: Rendering reports view');
-	},
-
-	filterTimecard() {
-		console.log('TimeVault: Filtering timecard');
-	},
-
-	updatePayrollView() {
-		console.log('TimeVault: Updating payroll view');
-	},
 
 	filterReport() {
 		console.log('TimeVault: Filtering report');
@@ -2162,68 +2145,4 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		alert('CSV Export feature coming soon!');
 	},
 
-	exportData() {
-		const data = localStorage.getItem('timevault_data');
-		const blob = new Blob([data], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `timevault-backup-${new Date().toISOString().split('T')[0]}.json`;
-		a.click();
-		URL.revokeObjectURL(url);
-		this.showNotification('Data Exported', 'Your TimeVault data has been downloaded');
-	},
-
-	importData() {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = 'application/json';
-		input.onchange = (e) => {
-			const file = e.target.files[0];
-			if (file) {
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					try {
-						const data = JSON.parse(event.target.result);
-						localStorage.setItem('timevault_data', JSON.stringify(data));
-						location.reload();
-					} catch (error) {
-						alert('Error importing data. Please check the file format.');
-					}
-				};
-				reader.readAsText(file);
-			}
-		};
-		input.click();
-	},
-
-	toggleVoiceInput() {
-		if (!this.voiceRecognition) {
-			alert('Voice recognition is not supported in your browser');
-			return;
-		}
-
-		if (this.aiConfig.isListening) {
-			this.voiceRecognition.stop();
-		} else {
-			this.voiceRecognition.start();
-		}
-	},
-
-	updateVoiceButton(isListening) {
-		const voiceBtn = document.getElementById('voice-input-btn');
-		if (voiceBtn) {
-			if (isListening) {
-				voiceBtn.classList.add('listening');
-			} else {
-				voiceBtn.classList.remove('listening');
-			}
-		}
-	}
 };
-
-
-// Initialize TimeVault when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-	TimeVault.init();
-});

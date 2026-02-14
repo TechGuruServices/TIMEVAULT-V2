@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#050e2d",
-  "theme_color": "#3d7eff",
+  "theme_color": "#01081f",
   "prefer_related_applications": false,
   "categories": [
     "productivity",
@@ -55,7 +55,7 @@
       "src": "icons/time-icons_favicon_96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/time-icons_apple_57x57.png",
@@ -122,7 +122,7 @@
       "src": "icons/time-icons_android_512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "shortcuts": [
