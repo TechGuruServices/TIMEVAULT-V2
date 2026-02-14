@@ -59,16 +59,14 @@
 
 ## 🏗️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Structure | HTML5 (semantic, accessible) |
-| Styling | Vanilla CSS (glassmorphism, animations, dark theme) |
-| Logic | Vanilla JavaScript (ES6+, single-file architecture) |
-| Charts | [Chart.js 3.9.1](https://www.chartjs.org/) |
-| Background | [particles.js 2.0](https://vincentgarreau.com/particles.js/) |
-| AI | [Ollama](https://ollama.ai/) (optional, local LLM) |
-| Storage | localStorage (local-first) |
-| Offline | Service Worker with cache-first strategy |
+| Feature | Tech Used | Status |
+| :--- | :--- | :--- |
+| **PWA Core** | Service Worker, Manifest | ✅ Active |
+| **Styling** | Vanilla CSS (Variables) | ✅ Active |
+| **Icons** | Phosphor / Custom SVG | ✅ Active |
+| **State** | LocalStorage API | ✅ Active |
+| **Charts** | Chart.js | ✅ Active |
+| **AI** | Ollama API (Local LLM) | 🚧 Beta |
 
 ---
 
@@ -101,7 +99,7 @@ TimeVault uses a **local-first** architecture. All data lives in the browser's `
 ### What's Stored
 
 | Data | Description | Persistence |
-|---|---|---|
+| :--- | :--- | :--- |
 | `settings` | Hourly rate, overtime config, currency, time format | Until cleared |
 | `timeEntries` | Array of all clock in/out sessions with earnings | Until cleared |
 | `aiMemory` | Conversation history (last 50 messages) | Until cleared |
@@ -197,7 +195,7 @@ For remote access (e.g., from a phone on the same network), set the Remote URL t
 ### Pay Settings
 
 | Setting | Default | Description |
-|---|---|---|
+| :--- | :--- | :--- |
 | Hourly Rate | $25.00 | Base pay rate per hour |
 | Overtime Multiplier | 1.5x | Applied after overtime threshold |
 | Overtime Threshold | 40 hrs/week | Hours before overtime kicks in |
@@ -206,7 +204,7 @@ For remote access (e.g., from a phone on the same network), set the Remote URL t
 ### Display Settings
 
 | Setting | Options | Default |
-|---|---|---|
+| :--- | :--- | :--- |
 | Currency | $, €, £, ¥ | $ (USD) |
 | Time Format | 12-hour, 24-hour | 12-hour |
 | Date Format | MM/DD/YYYY, DD/MM/YYYY, YYYY-MM-DD | MM/DD/YYYY |
@@ -216,7 +214,7 @@ For remote access (e.g., from a phone on the same network), set the Remote URL t
 ## 📱 Browser Compatibility
 
 | Browser | Support |
-|---|---|
+| :--- | :--- |
 | Chrome / Edge | ✅ Full (PWA install, notifications, voice) |
 | Firefox | ✅ Full (no install prompt) |
 | Safari / iOS | ✅ Partial (no push notifications, limited voice) |

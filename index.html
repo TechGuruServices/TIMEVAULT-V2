@@ -711,6 +711,10 @@
             </div>
           </div>
 
+          <div class="setting-row">
+            <button id="generate-summary-btn" class="action-btn full-width mt-sm">Generate Weekly Summary</button>
+          </div>
+
           <div class="settings-footer">
             <button id="save-settings-btn" class="btn-save-settings">Save Settings</button>
           </div>
@@ -997,6 +1001,7 @@
   <script src="apps.js"></script>
 
   <!-- Initialize TimeVault -->
+  <div id="toast-container" class="toast-container"></div>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       document.body.style.overflow = 'hidden';

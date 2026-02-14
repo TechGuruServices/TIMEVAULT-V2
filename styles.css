@@ -2944,3 +2944,212 @@ button {
     width: 100%;
   }
 }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.app-footer {
+  text-align: center;
+  padding: 16px 24px;
+  background: var(--glass-bg);
+  border-top: 1px solid var(--glass-border);
+  color: var(--secondary-color);
+  font-size: 13px;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.app-footer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.footer-favicon {
+  border-radius: 4px;
+}
+
+.credit {
+  font-size: 12px;
+  color: var(--secondary-color);
+}
+
+.techguru {
+  font-weight: 700;
+  background: linear-gradient(90deg, #3d7eff, #00cfde, #61e1a1, #fdac42, #ff7dcb, #3d7eff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbowShift 4s ease infinite;
+}
+
+@keyframes rainbowShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--app-logo);
+  border-radius: 12px;
+  padding: 16px;
+  width: 320px;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideInToast 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.toast.hiding {
+  animation: slideOutToast 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--secondary-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toast-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.toast-message {
+  font-size: 13px;
+  color: var(--secondary-color);
+  line-height: 1.5;
+}
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--app-logo);
+  width: 100%;
+}
+
+.toast-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.toast-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toast-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateX(50px) scale(0.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes slideOutToast {
+  to { opacity: 0; transform: translateX(50px) scale(0.9); }
+}
+
+/* Toast Variants */
+.toast-success { border-left-color: #61e1a1; }
+.toast-success .toast-progress { background: #61e1a1; }
+
+.toast-warning { border-left-color: #fdac42; }
+.toast-warning .toast-progress { background: #fdac42; }
+
+.toast-error { border-left-color: #ff5c5c; }
+.toast-error .toast-progress { background: #ff5c5c; }
+
+/* ============================================
+   DRAG AND DROP
+   ============================================ */
+
+.drag-handle {
+  cursor: grab;
+  color: var(--secondary-color);
+  padding: 8px;
+  touch-action: none; /* Prevent scrolling while dragging on touch */
+}
+
+.drag-handle:hover {
+  color: var(--app-logo);
+}
+
+.dragging {
+  opacity: 0.5;
+  background: rgba(61, 126, 255, 0.1) !important;
+  border: 1px dashed var(--app-logo);
+}
+
+.drag-over {
+  border-top: 2px solid var(--app-logo) !important;
+}
+
+/* Utility Classes */
+.full-width {
+  width: 100%;
+}
+
+.mt-sm {
+  margin-top: 0.625rem; /* ~10px */
+}
+

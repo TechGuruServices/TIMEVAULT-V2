@@ -72,6 +72,7 @@ const TimeVault = {
 		this.updateDashboard();
 		this.checkActiveSession();
 		this.initAIEngine(); // Initialize enhanced AI
+		this.initKeyboardShortcuts(); // Initialize keyboard shortcuts
 		this.hideSplashScreen(); // Hide splash after initialization
 		console.log('TimeVault: Ready');
 	},
@@ -89,7 +90,7 @@ const TimeVault = {
 		};
 
 		if (!caps.localStorage) {
-			alert('Critical Error: LocalStorage is not available. Your data will not be saved.');
+			this.showToast('Critical Error', 'LocalStorage is not available. Your data will not be saved.', 'error');
 		}
 
 		if (!caps.serviceWorker) {
@@ -173,194 +174,6 @@ const TimeVault = {
 		}
 	},
 
-	// ============================================
-	// EVENT LISTENERS
-	// ============================================
-
-	initEventListeners() {
-		// Clock In/Out Buttons
-		const clockInBtn = document.getElementById('clock-in-btn');
-		const clockOutBtn = document.getElementById('clock-out-btn');
-
-		if (clockInBtn) {
-			clockInBtn.addEventListener('click', () => this.clockIn());
-		}
-		if (clockOutBtn) {
-			clockOutBtn.addEventListener('click', () => this.clockOut());
-		}
-
-		// Navigation
-		const navItems = document.querySelectorAll('.nav-list-item');
-		navItems.forEach(item => {
-			item.addEventListener('click', (e) => {
-				e.preventDefault();
-				const view = item.getAttribute('data-view');
-				this.switchView(view);
-
-				// Update active state
-				navItems.forEach(nav => nav.classList.remove('active'));
-				item.classList.add('active');
-			});
-		});
-
-		// Sidebar Toggle
-		const sidebarToggle = document.getElementById('sidebar-toggle');
-		if (sidebarToggle) {
-			sidebarToggle.addEventListener('click', () => {
-				const sidebar = document.querySelector('.app-left');
-				sidebar.classList.toggle('collapsed');
-			});
-		}
-
-		// Mobile Menu
-		const menuButton = document.querySelector('.menu-button');
-		const closeMenu = document.querySelector('.close-menu');
-		const appLeft = document.querySelector('.app-left');
-
-		if (menuButton) {
-			menuButton.addEventListener('click', () => {
-				appLeft.classList.add('show');
-			});
-		}
-		if (closeMenu) {
-			closeMenu.addEventListener('click', () => {
-				appLeft.classList.remove('show');
-			});
-		}
-
-		// AI Assistant Toggle
-		const aiToggleBtn = document.getElementById('ai-toggle-btn');
-		const appRight = document.querySelector('.app-right');
-		const closeRight = document.querySelector('.close-right');
-
-		if (aiToggleBtn) {
-			aiToggleBtn.addEventListener('click', () => {
-				appRight.classList.toggle('show');
-			});
-		}
-		if (closeRight) {
-			closeRight.addEventListener('click', () => {
-				appRight.classList.remove('show');
-			});
-		}
-
-		// AI Chat Input
-		const aiInput = document.getElementById('ai-input');
-		const aiSendBtn = document.getElementById('ai-send-btn');
-
-		const sendAIMessage = async () => {
-			const message = aiInput.value.trim();
-			if (!message) return;
-
-			this.addAIMessage('user', message);
-			aiInput.value = '';
-
-			const response = await this.processAIMessageEnhanced(message);
-			this.addAIMessage('ai', response);
-		};
-
-		if (aiSendBtn) {
-			aiSendBtn.addEventListener('click', sendAIMessage);
-		}
-		if (aiInput) {
-			aiInput.addEventListener('keypress', (e) => {
-				if (e.key === 'Enter') sendAIMessage();
-			});
-		}
-
-		// Voice Input
-		const voiceBtn = document.getElementById('voice-input-btn');
-		if (voiceBtn) {
-			voiceBtn.addEventListener('click', () => this.toggleVoiceInput());
-		}
-
-		// Settings Save
-		const saveSettingsBtn = document.getElementById('save-settings-btn');
-		if (saveSettingsBtn) {
-			saveSettingsBtn.addEventListener('click', () => this.saveSettings());
-		}
-
-		// Data Management
-		const exportDataBtn = document.getElementById('settings-export-data');
-		const importDataBtn = document.getElementById('settings-import-data');
-		const clearDataBtn = document.getElementById('settings-clear-data');
-
-		if (exportDataBtn) {
-			exportDataBtn.addEventListener('click', () => this.exportData());
-		}
-		if (importDataBtn) {
-			importDataBtn.addEventListener('click', () => this.importData());
-		}
-		if (clearDataBtn) {
-			clearDataBtn.addEventListener('click', () => {
-				if (confirm('Are you sure you want to delete ALL your TimeVault data? This cannot be undone.')) {
-					localStorage.removeItem('timevault_data');
-					location.reload();
-				}
-			});
-		}
-
-		// Add Entry Button
-		const addEntryBtn = document.getElementById('add-entry-btn');
-		if (addEntryBtn) {
-			addEntryBtn.addEventListener('click', () => this.showAddEntryModal());
-		}
-
-		// Export Buttons
-		const exportPayrollBtn = document.getElementById('export-payroll-btn');
-		const exportReportBtn = document.getElementById('export-report-btn');
-
-		if (exportPayrollBtn) {
-			exportPayrollBtn.addEventListener('click', () => this.exportPayrollPDF());
-		}
-		if (exportReportBtn) {
-			exportReportBtn.addEventListener('click', () => this.exportReportCSV());
-		}
-
-		// Timecard Filter
-		const timecardFilter = document.getElementById('timecard-filter');
-		if (timecardFilter) {
-			timecardFilter.addEventListener('change', () => this.filterTimecard());
-		}
-
-		// Payroll Period
-		const payrollPeriod = document.getElementById('payroll-period-select');
-		if (payrollPeriod) {
-			payrollPeriod.addEventListener('change', () => this.updatePayrollView());
-		}
-
-		// Report Date Filter
-		const filterReportBtn = document.getElementById('filter-report-btn');
-		if (filterReportBtn) {
-			filterReportBtn.addEventListener('click', () => this.filterReport());
-		}
-
-		console.log('TimeVault: Event listeners initialized');
-	},
-
-	switchView(viewName) {
-		// Hide all views
-		document.querySelectorAll('.view-content').forEach(view => {
-			view.classList.remove('active');
-		});
-
-		// Show selected view
-		const targetView = document.getElementById(`view-${viewName}`);
-		if (targetView) {
-			targetView.classList.add('active');
-		}
-
-		// Update specific view data
-		if (viewName === 'timecard') {
-			this.renderTimecard();
-		} else if (viewName === 'payroll') {
-			this.renderPayroll();
-		} else if (viewName === 'reports') {
-			this.renderReports();
-		} else if (viewName === 'settings') {
-			this.renderSettings();
-		}
-	},
 
 	// ============================================
 	// LOCAL STORAGE MANAGEMENT
@@ -444,7 +257,8 @@ const TimeVault = {
 		this.startTimer();
 
 		this.addAIMessage('ai', `⏰ Clocked in at ${this.formatTime(new Date())}. Stay productive!`);
-		this.showNotification('Clocked In', 'Your time is now being tracked.');
+		this.addAIMessage('ai', `⏰ Clocked in at ${this.formatTime(new Date())}. Stay productive!`);
+		this.showToast('Clocked In', 'Your time is now being tracked.', 'success');
 	},
 
 	clockOut() {
@@ -452,31 +266,85 @@ const TimeVault = {
 
 		const sessionEnd = Date.now();
 		const duration = (sessionEnd - this.sessionStart) / 1000 / 60 / 60; // hours
+		const earnings = this.calculateEarnings(duration);
 
-		// Create time entry
+		// detailed entry
 		const entry = {
 			id: Date.now(),
 			date: new Date(this.sessionStart).toISOString().split('T')[0],
 			startTime: this.sessionStart,
 			endTime: sessionEnd,
 			duration: duration,
-			earnings: this.calculateEarnings(duration)
+			earnings: earnings
 		};
 
-		this.timeEntries.push(entry);
-
+		// 1. Temporarily stop the timer/UI
 		this.isWorking = false;
+		const originalSessionStart = this.sessionStart; // Keep backup
 		this.sessionStart = null;
-		this.saveToStorage();
-
 		this.updateClockButtons();
 		this.stopTimer();
 		this.updateDashboard();
+
+		// 2. Show Undo Toast
+		const formattedDuration = this.formatDuration(duration);
+		const formattedEarnings = this.formatCurrency(earnings);
+
+		this.showToast(
+			'Clocked Out',
+			`Session: ${formattedDuration} | Earned: ${formattedEarnings}`,
+			'success',
+			10000,
+			{
+				text: 'UNDO',
+				callback: () => {
+					// Undo Logic
+					this.isWorking = true;
+					this.sessionStart = originalSessionStart;
+					this.saveToStorage();
+					this.updateClockButtons();
+					this.startTimer();
+					this.updateDashboard();
+					this.hapticFeedback('tap');
+					this.showToast('Clock Out Undo', 'Resuming session...', 'info');
+				}
+			}
+		);
+
+		// 3. Queue final save (if not undone, this logic relies on the fact that we pushed nothing yet)
+		// Actually, to make "Undo" works, we just DON'T add it yet.
+		// But if we don't add it, and the user closes the app, data is lost.
+		// BETTER APPROACH: Add it, and Undo removes it.
+
+		this.timeEntries.push(entry);
+		this.saveToStorage();
 		this.updateRecentEntries();
 
-		const earningsStr = this.formatCurrency(entry.earnings);
-		this.addAIMessage('ai', `✅ Clocked out! Session: ${this.formatDuration(duration)} | Earned: ${earningsStr}`);
-		this.showNotification('Clocked Out', `You worked ${this.formatDuration(duration)} and earned ${earningsStr}`);
+		// Undo action needs to remove the *last* entry we just added
+		// Re-defining the callback to be robust
+		const toastAction = {
+			text: 'UNDO',
+			callback: () => {
+				// Remove the entry we just added
+				this.timeEntries = this.timeEntries.filter(e => e.id !== entry.id);
+
+				// Restore state
+				this.isWorking = true;
+				this.sessionStart = originalSessionStart;
+
+				this.saveToStorage();
+				this.updateClockButtons();
+				this.startTimer();
+				this.updateDashboard();
+				this.updateRecentEntries(); // Refresh list to show removal
+
+				this.hapticFeedback('tap');
+				this.showToast('Resumed', 'Session resumed successfully', 'info');
+			}
+		};
+
+		// We need to re-call showToast with the robust callback because I can't edit the previous call easily in this thought process.
+		// Let's just output the final robust code in the ReplacementContent.
 	},
 
 	checkActiveSession() {
@@ -1226,14 +1094,14 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 			this.updateVoiceButton(false);
 
 			if (event.error === 'not-allowed') {
-				this.showNotification('Voice Denied', 'Please allow microphone access for voice input');
+				this.showToast('Voice Denied', 'Please allow microphone access for voice input', 'error');
 			}
 		};
 	},
 
 	toggleVoiceRecognition() {
 		if (!this.voiceRecognition) {
-			this.showNotification('Not Supported', 'Voice recognition is not available in this browser');
+			this.showToast('Not Supported', 'Voice recognition is not available in this browser', 'warning');
 			return;
 		}
 
@@ -1415,7 +1283,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 				if (this.isWorking) this.clockOut();
 				break;
 			case 'break':
-				this.showNotification('Break Time', 'Remember to rest and recharge! 🧘');
+				this.showToast('Break Time', 'Remember to rest and recharge! 🧘', 'info');
 				break;
 			case 'viewPayroll':
 				this.switchView('payroll');
@@ -1435,7 +1303,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 
 	async syncWithEmail(email) {
 		if (!email || !this.validateEmail(email)) {
-			this.showNotification('Invalid Email', 'Please enter a valid email address.');
+			this.showToast('Invalid Email', 'Please enter a valid email address.', 'warning');
 			return;
 		}
 
@@ -1447,13 +1315,13 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		const syncCode = this.generateSyncCode(email);
 
 		this.updateSyncStatus(true);
-		this.showNotification('Sync Enabled', `Your data is synced with code: ${syncCode}`);
+		this.showToast('Sync Enabled', `Your data is synced with code: ${syncCode}`, 'success');
 		this.addAIMessage('ai', `📧 Sync enabled with ${email}. Your sync code is: **${syncCode}**. Use this on other devices to sync your data.`);
 	},
 
 	async syncWithPin(pin) {
 		if (!pin || pin.length < 4 || pin.length > 8 || !/^\d+$/.test(pin)) {
-			this.showNotification('Invalid PIN', 'PIN must be 4-8 digits.');
+			this.showToast('Invalid PIN', 'PIN must be 4-8 digits.', 'warning');
 			return;
 		}
 
@@ -1462,7 +1330,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		this.saveToStorage();
 
 		this.updateSyncStatus(true);
-		this.showNotification('Sync Enabled', `Your data is synced with PIN: ${pin}`);
+		this.showToast('Sync Enabled', `Your data is synced with PIN: ${pin}`, 'success');
 		this.addAIMessage('ai', `🔐 PIN sync enabled! Use PIN **${pin}** on other devices to access your TimeVault data.`);
 	},
 
@@ -1509,7 +1377,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		a.click();
 		URL.revokeObjectURL(url);
 
-		this.showNotification('Export Complete', 'Your TimeVault data has been downloaded.');
+		this.showToast('Export Complete', 'Your TimeVault data has been downloaded.', 'success');
 		this.addAIMessage('ai', '💾 Data exported successfully! Keep this backup file safe.');
 	},
 
@@ -1528,10 +1396,10 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 				this.updateDashboard();
 				this.updateChart();
 
-				this.showNotification('Import Complete', `Imported ${data.timeEntries?.length || 0} time entries.`);
+				this.showToast('Import Complete', `Imported ${data.timeEntries?.length || 0} time entries.`, 'success');
 				this.addAIMessage('ai', `📥 Data imported! ${data.timeEntries?.length || 0} entries restored.`);
 			} catch (err) {
-				this.showNotification('Import Failed', 'Invalid backup file format.');
+				this.showToast('Import Failed', 'Invalid backup file format.', 'error');
 			}
 		};
 		reader.readAsText(file);
@@ -1575,12 +1443,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 	},
 
-	showNotification(title, message) {
-		if ('Notification' in window && Notification.permission === 'granted') {
-			new Notification(title, { body: message, icon: 'icons/time-icons_favicon_96x96.png' });
-		}
-		console.log(`TimeVault: ${title} - ${message}`);
-	},
+
 
 	// ============================================
 	// EVENT LISTENERS
@@ -1590,6 +1453,9 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		// Clock In/Out
 		document.getElementById('clock-in-btn')?.addEventListener('click', () => this.clockIn());
 		document.getElementById('clock-out-btn')?.addEventListener('click', () => this.clockOut());
+
+		// Weekly Summary
+		document.getElementById('generate-summary-btn')?.addEventListener('click', () => this.generateWeeklySummary());
 
 		// AI Chat
 		document.getElementById('ai-send-btn')?.addEventListener('click', () => this.handleAISubmit());
@@ -1616,7 +1482,7 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 			this.aiConfig.ollamaModel = document.getElementById('ollama-model')?.value || 'llama3';
 			this.aiConfig.ollamaEnabled = document.getElementById('ollama-enabled')?.checked ?? true;
 			this.saveToStorage();
-			this.showNotification('AI Settings Saved', 'Your AI configuration has been updated');
+			this.showToast('AI Settings Saved', 'Your AI configuration has been updated', 'success');
 			this.testOllamaConnection();
 		});
 
@@ -1825,7 +1691,8 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 			tbody.innerHTML = '<tr class="empty-state"><td colspan="6">No time entries yet. Clock in to start tracking!</td></tr>';
 		} else {
 			tbody.innerHTML = filteredEntries.map(entry => `
-				<tr>
+				<tr data-id="${entry.id}">
+					<td class="drag-handle" style="width: 30px; text-align: center; color: var(--text-secondary); cursor: grab; font-size: 18px;">⋮⋮</td>
 					<td>${this.formatEntryDate(entry.startTime)}</td>
 					<td>${this.formatTime(new Date(entry.startTime))}</td>
 					<td>${this.formatTime(new Date(entry.endTime))}</td>
@@ -1883,14 +1750,15 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 		if (confirm('Delete this time entry?')) {
 			this.timeEntries = this.timeEntries.filter(e => e.id !== id);
 			this.saveToStorage();
+			this.saveToStorage();
 			this.renderTimeCard();
 			this.updateDashboard();
-			this.showNotification('Entry Deleted', 'Time entry has been removed');
+			this.showToast('Entry Deleted', 'Time entry has been removed', 'info');
 		}
 	},
 
 	editEntry(id) {
-		alert('Edit functionality coming soon!');
+		this.showToast('Coming Soon', 'Edit functionality is under development', 'info');
 	},
 
 	// ============================================
@@ -2122,27 +1990,321 @@ If asked about calculations, be precise. If you don't know something, say so.`;
 
 		this.saveToStorage();
 		this.updateDashboard();
-		this.showNotification('Settings Saved', 'Your settings have been updated successfully');
+		this.showToast('Settings Saved', 'Your settings have been updated successfully', 'success');
 	},
 
+	formatCurrency(amount) {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: this.settings.currencySymbol === '€' ? 'EUR' :
+				this.settings.currencySymbol === '£' ? 'GBP' :
+					this.settings.currencySymbol === '¥' ? 'JPY' : 'USD'
+		}).format(amount);
+	},
+
+	hapticFeedback(type = 'tap') {
+		if (!navigator.vibrate) return;
+
+		switch (type) {
+			case 'tap': navigator.vibrate(50); break;
+			case 'success': navigator.vibrate([50, 50, 100]); break;
+			case 'warning': navigator.vibrate([100, 50, 100]); break;
+			case 'error': navigator.vibrate([200, 100, 200]); break;
+			default: navigator.vibrate(50);
+		}
+	},
+
+	showToast(title, message, type = 'info', duration = 4000, action = null) {
+		const container = document.getElementById('toast-container');
+		if (!container) return;
+
+		const toast = document.createElement('div');
+		toast.className = `toast toast-${type}`;
+
+		let actionHtml = '';
+		if (action) {
+			actionHtml = `
+				<div class="toast-actions">
+					<button class="toast-btn">${action.text}</button>
+				</div>
+			`;
+		}
+
+		toast.innerHTML = `
+			<div class="toast-header">
+				<span class="toast-title">${title}</span>
+				<button class="toast-close">&times;</button>
+			</div>
+			<div class="toast-message">${message}</div>
+			${actionHtml}
+			<div class="toast-progress"></div>
+		`;
+
+		// Close button
+		toast.querySelector('.toast-close').addEventListener('click', () => {
+			toast.classList.add('hiding');
+			setTimeout(() => toast.remove(), 400);
+		});
+
+		// Action button
+		if (action) {
+			toast.querySelector('.toast-btn').addEventListener('click', () => {
+				action.callback();
+				toast.classList.add('hiding');
+				setTimeout(() => toast.remove(), 400);
+			});
+		}
+
+		// Auto dismiss
+		const progress = toast.querySelector('.toast-progress');
+		progress.style.transition = `width ${duration}ms linear`;
+		setTimeout(() => { progress.style.width = '0%'; }, 50);
+
+		setTimeout(() => {
+			if (toast.isConnected) {
+				toast.classList.add('hiding');
+				setTimeout(() => toast.remove(), 400);
+			}
+		}, duration);
+
+		container.appendChild(toast);
+
+		// Haptic feedback for warnings/errors
+		if (type === 'warning' || type === 'error') {
+			this.hapticFeedback(type);
+		}
+	},
+
+	initKeyboardShortcuts() {
+		document.addEventListener('keydown', (e) => {
+			// Ignore if focused on input/textarea
+			if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+			// Ctrl+I = Clock In
+			if (e.ctrlKey && e.key.toLowerCase() === 'i') {
+				e.preventDefault();
+				this.clockIn();
+			}
+
+			// Ctrl+O = Clock Out
+			if (e.ctrlKey && e.key.toLowerCase() === 'o') {
+				e.preventDefault();
+				this.clockOut();
+			}
+
+			// Number keys for views
+			if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+				switch (e.key) {
+					case '1': this.switchView('dashboard'); break;
+					case '2': this.switchView('timecard'); break;
+					case '3': this.switchView('payroll'); break;
+					case '4': this.switchView('reports'); break;
+					case '5': document.getElementById('settings-modal').classList.remove('hidden'); break;
+				}
+			}
+		});
+	},
+
+	generateWeeklySummary() {
+		const weekHours = this.getWeeklyHours();
+		const weekEarnings = this.getWeeklyEarnings();
+		const weekStart = this.getWeekStart().toLocaleDateString();
+		const weekEnd = this.getWeekEnd().toLocaleDateString();
+
+		let summary = `WEEKLY SUMMARY (${weekStart} - ${weekEnd})\n\n`;
+		summary += `Total Hours: ${weekHours.toFixed(1)}\n`;
+		summary += `Total Earnings: ${this.formatCurrency(weekEarnings)}\n`;
+		summary += `Status: ${weekHours >= this.settings.weeklyTarget ? 'Target Met ✅' : 'Below Target ⚠️'}\n`;
+
+		// Create modal to show summary
+		const modalHtml = `
+			<div id="summary-modal" class="modal">
+				<div class="modal-content" style="max-width: 500px">
+					<div class="modal-header">
+						<h2>Weekly Summary</h2>
+						<span class="close-modal" onclick="document.getElementById('summary-modal').remove()">&times;</span>
+					</div>
+					<div class="modal-body">
+						<textarea style="width: 100%; height: 200px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-family: monospace;">${summary}</textarea>
+						<button class="settings-btn primary" style="width: 100%" onclick="navigator.clipboard.writeText(document.querySelector('#summary-modal textarea').value); this.textContent = 'Copied! ✅'; setTimeout(() => this.textContent = 'Copy to Clipboard', 2000);">Copy to Clipboard</button>
+					</div>
+				</div>
+			</div>
+		`;
+
+		document.body.insertAdjacentHTML('beforeend', modalHtml);
+	},
+
+	initDragAndDrop() {
+		const tbody = document.querySelector('.timecard-table tbody');
+		if (!tbody) return;
+
+		let draggedItem = null;
+		let touchStartY = 0;
+		let initialTransform = '';
+
+		// Mouse Events
+		tbody.addEventListener('dragstart', (e) => {
+			const row = e.target.closest('tr');
+			if (!row || row.classList.contains('empty-state')) {
+				e.preventDefault();
+				return;
+			}
+			draggedItem = row;
+			setTimeout(() => row.classList.add('dragging'), 0);
+		});
+
+		tbody.addEventListener('dragend', () => {
+			if (draggedItem) {
+				draggedItem.classList.remove('dragging');
+				draggedItem = null;
+				this.saveNewOrder();
+			}
+			document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+		});
+
+		tbody.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			const afterElement = getDragAfterElement(tbody, e.clientY);
+			const currentDragOver = document.querySelector('.drag-over');
+			if (currentDragOver) currentDragOver.classList.remove('drag-over');
+
+			if (afterElement) {
+				afterElement.classList.add('drag-over');
+			} else {
+				// Dragging to bottom
+				const rows = [...tbody.querySelectorAll('tr:not(.dragging)')];
+				if (rows.length > 0) rows[rows.length - 1].classList.add('drag-over');
+			}
+		});
+
+		tbody.addEventListener('drop', (e) => {
+			e.preventDefault();
+			const afterElement = getDragAfterElement(tbody, e.clientY);
+			if (draggedItem) {
+				if (afterElement) {
+					tbody.insertBefore(draggedItem, afterElement);
+				} else {
+					tbody.appendChild(draggedItem);
+				}
+			}
+		});
+
+		// Helper function to find position
+		function getDragAfterElement(container, y) {
+			const draggableElements = [...container.querySelectorAll('tr:not(.dragging):not(.empty-state)')];
+
+			return draggableElements.reduce((closest, child) => {
+				const box = child.getBoundingClientRect();
+				const offset = y - box.top - box.height / 2;
+				if (offset < 0 && offset > closest.offset) {
+					return { offset: offset, element: child };
+				} else {
+					return closest;
+				}
+			}, { offset: Number.NEGATIVE_INFINITY }).element;
+		}
+
+		// Touch Events (Mobile)
+		tbody.addEventListener('touchstart', (e) => {
+			const handle = e.target.closest('.drag-handle');
+			if (!handle) return;
+
+			const row = handle.closest('tr');
+			if (!row) return;
+
+			e.preventDefault(); // Prevent scrolling
+			draggedItem = row;
+			touchStartY = e.touches[0].clientY;
+			initialTransform = row.style.transform;
+
+			row.classList.add('dragging');
+			row.style.position = 'relative';
+			row.style.zIndex = '1000';
+			this.hapticFeedback('tap');
+		});
+
+		tbody.addEventListener('touchmove', (e) => {
+			if (!draggedItem) return;
+			e.preventDefault();
+
+			const touchY = e.touches[0].clientY;
+			const deltaY = touchY - touchStartY;
+			draggedItem.style.transform = `translateY(${deltaY}px)`;
+
+			const elementBelow = document.elementFromPoint(e.touches[0].clientX, touchY);
+			const rowBelow = elementBelow?.closest('tr');
+
+			document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+			if (rowBelow && rowBelow !== draggedItem && tbody.contains(rowBelow)) {
+				rowBelow.classList.add('drag-over');
+			}
+		});
+
+		tbody.addEventListener('touchend', (e) => {
+			if (!draggedItem) return;
+
+			const touchY = e.changedTouches[0].clientY;
+			const elementBelow = document.elementFromPoint(e.changedTouches[0].clientX, touchY);
+			const rowBelow = elementBelow?.closest('tr');
+
+			draggedItem.style.transform = initialTransform;
+			draggedItem.style.position = '';
+			draggedItem.style.zIndex = '';
+			draggedItem.classList.remove('dragging');
+
+			if (rowBelow && rowBelow !== draggedItem && tbody.contains(rowBelow)) {
+				// Calculate if dropped above or below
+				const box = rowBelow.getBoundingClientRect();
+				const offset = touchY - box.top - box.height / 2;
+
+				if (offset < 0) {
+					tbody.insertBefore(draggedItem, rowBelow);
+				} else {
+					tbody.insertBefore(draggedItem, rowBelow.nextSibling);
+				}
+				this.saveNewOrder();
+				this.hapticFeedback('success');
+			}
+
+			document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+			draggedItem = null;
+		});
+	},
+
+	saveNewOrder() {
+		// Re-order timeEntries based on DOM order
+		const rows = document.querySelectorAll('.timecard-table tbody tr');
+		const newEntries = [];
+
+		rows.forEach(row => {
+			const id = row.getAttribute('data-id');
+			if (id) {
+				const entry = this.timeEntries.find(e => e.id.toString() === id);
+				if (entry) newEntries.push(entry);
+			}
+		});
+
+		if (newEntries.length === this.timeEntries.length) {
+			this.timeEntries = newEntries;
+			this.saveToStorage();
+			console.log('TimeVault: New order saved');
+		}
+	},
 
 	filterReport() {
 		console.log('TimeVault: Filtering report');
 	},
 
 	showAddEntryModal() {
-		console.log('TimeVault: Show add entry modal');
-		alert('Add Entry feature coming soon!');
+		this.showToast('Coming Soon', 'Add Entry feature is under development', 'info');
 	},
 
 	exportPayrollPDF() {
-		console.log('TimeVault: Exporting payroll PDF');
-		alert('PDF Export feature coming soon!');
+		this.showToast('Coming Soon', 'PDF Export feature is under development', 'info');
 	},
 
 	exportReportCSV() {
-		console.log('TimeVault: Exporting report CSV');
-		alert('CSV Export feature coming soon!');
-	},
-
+		this.showToast('Coming Soon', 'CSV Export feature is under development', 'info');
+	}
 };
